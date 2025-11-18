@@ -51,15 +51,21 @@
 </head>
 <body class="min-h-screen antialiased">
 
-    <!-- 1. Cabecera (Header) - CON LOGO Y REDES SOCIALES -->
+    <!-- 1. Cabecera (Header) - CON LOGO Y REDES SOCIALES. Fondo Crema Pergamino -->
+    <!-- Se usa un color claro y transparente 'bg-white/90' que con el fondo pergamino resulta en la tonalidad deseada. -->
     <header class="bg-white/90 shadow-lg backdrop-blur-sm sticky top-0 z-10 border-b border-gray-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center py-3">
             
-            <!-- Logo Personalizado (Placeholder de imagen) -->
+            <!-- Logo Personalizado (Ahora con la URL de GitHub) -->
             <div class="flex items-center space-x-4">
                 <a href="index.html" class="block w-36 h-10 overflow-hidden">
-                    <!-- IMPORTANTE: REEMPLAZA ESTE PLACEHOLDER POR TU LOGO REAL EN VERSIÓN PNG/SVG -->
-                   img src="Ibidem_logo_nuevo.jpg" alt="Logo Ibidem: Recreación Histórica" class="h-10 w-auto object-contain rounded-md" />
+                    <!-- URL del logo cargado: Ibidem_logo_nuevo.png. Asume que está en el repositorio base. -->
+                    <img 
+                        src="Ibidem_logo_nuevo.png" 
+                        alt="Logo Ibidem: Recreación Histórica" 
+                        class="h-10 w-auto object-cover rounded-md" 
+                        onerror="this.onerror=null; this.src='https://placehold.co/150x50/9A2A2A/F5EFE3?text=Ibidem';" 
+                    />
                 </a>
             </div>
 
@@ -162,7 +168,10 @@
             </div>
         </div>
     </footer>
-
+    
+    <!-- Script para funcionalidad (e.g., menú móvil, que no está implementado en JS todavía) -->
+    <script>
+        // Si tienes scripts de menú móvil, irían aquí.
+    </script>
 </body>
-
 </html>

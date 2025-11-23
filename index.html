@@ -39,18 +39,6 @@
             overflow-x: hidden;
         }
         
-        /* Clase especial para solo lectores de pantalla (Accesibilidad) */
-        .sr-only {
-            position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-            overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
-        }
-        /* Hacer visible el skip-link al recibir foco */
-        .skip-link:focus {
-            position: absolute; top: 0; left: 0; width: auto; height: auto;
-            background: var(--color-pompeyano); color: white; padding: 10px; z-index: 99999;
-            clip: auto; margin: 0;
-        }
-
         .font-cinzel { font-family: 'Cinzel', serif; }
         .font-merriweather { font-family: 'Merriweather', serif; }
         
@@ -75,6 +63,30 @@
         *:focus-visible {
             outline: 3px solid var(--color-pompeyano);
             outline-offset: 2px;
+        }
+        
+        /* --- CORRECCIÓN 1: OCULTAR "SALTAR AL CONTENIDO" POR DEFECTO --- */
+        .skip-link {
+            position: absolute; /* Sacarlo del flujo normal */
+            left: -9999px;      /* Moverlo fuera de la pantalla */
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            z-index: 99999; /* Alto z-index para que esté encima de todo al recibir foco */
+        }
+        .skip-link:focus {
+            /* Hacer visible al recibir foco (al pulsar Tab) */
+            position: absolute; 
+            left: 0; top: 0; 
+            width: auto; height: auto;
+            padding: 10px;
+            background: var(--color-pompeyano); 
+            color: white; 
+            text-decoration: none;
+            /* Resto de estilos que ya tenía */
+            font-family: 'Cinzel', serif; 
+            font-weight: bold;
         }
 
         #loader, #error-screen {
@@ -109,6 +121,7 @@
     </script>
 </head>
 <body>
+    <!-- CORRECCIÓN 1: La clase `skip-link` ahora tiene estilos base para estar oculta. -->
     <a href="#main-content" class="skip-link font-cinzel font-bold">Saltar al contenido principal</a>
 
     <div id="loader" aria-live="polite" role="status">
@@ -492,9 +505,9 @@
                         </div>
                     </div>
 
-                    {/* LIGHTBOX MODAL */}
+                    {/* CORRECCIÓN 2: LIGHTBOX MODAL - Usar h-screen y max-h-full para evitar clipping. */}
                     {lightboxIndex >= 0 && currentImg && (
-                        <div className="fixed inset-0 bg-black/95 flex flex-col justify-between z-[99999]" role="dialog" aria-modal="true" aria-label="Visor de imágenes">
+                        <div className="fixed inset-0 bg-black/95 flex flex-col justify-between z-[99999] h-screen" role="dialog" aria-modal="true" aria-label="Visor de imágenes">
                             <button 
                                 ref={closeButtonRef}
                                 className="absolute top-4 right-4 text-white p-2 hover:text-dorado transition z-[100000] focus:ring-2 focus:ring-dorado rounded"
@@ -504,8 +517,15 @@
                                 <Icon path={Icons.X} size={32}/>
                             </button>
                             
-                            <div className="flex-grow flex items-center justify-center p-4 overflow-hidden relative w-full h-full" onClick={() => setLightboxIndex(-1)}>
-                                <img src={currentImg.src} alt={currentImg.caption || "Imagen ampliada"} className="max-w-full max-h-[75vh] shadow-2xl border border-pizarra/50 object-contain rounded-sm" onClick={e => e.stopPropagation()} />
+                            {/* Flex-grow asegura que esta área tome el espacio restante */}
+                            <div className="flex-grow flex items-center justify-center p-4 overflow-hidden relative w-full" onClick={() => setLightboxIndex(-1)}>
+                                <img 
+                                    src={currentImg.src} 
+                                    alt={currentImg.caption || "Imagen ampliada"} 
+                                    /* La clave es max-h-full: se ajusta al 100% de la altura disponible de su contenedor (el área flex-grow) */
+                                    className="max-w-full max-h-full shadow-2xl border border-pizarra/50 object-contain rounded-sm" 
+                                    onClick={e => e.stopPropagation()} 
+                                />
                             </div>
 
                             <div className="w-full bg-black/90 flex flex-col pt-2 pb-4 border-t border-gray-800" onClick={e => e.stopPropagation()}>
@@ -536,62 +556,6 @@
                             </div>
                         </div>
                     )}
-                </div>
-            );
-        };
-
-        const ModalLegal = ({ type, onClose }) => {
-            const modalRef = useRef(null);
-            
-            // Atrapado de foco simple
-            useEffect(() => {
-                if(type && modalRef.current) {
-                    modalRef.current.focus();
-                }
-            }, [type]);
-
-            if (!type) return null;
-            
-            return (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[10000] p-4 fade-in" role="dialog" aria-modal="true" onClick={onClose}>
-                    <div 
-                        ref={modalRef}
-                        tabIndex="-1"
-                        className="bg-white p-6 md:p-10 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border-4 border-double border-pompeyano focus:outline-none" 
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div className="flex justify-between items-center mb-6 border-b border-dorado pb-2">
-                            <h2 className="font-cinzel text-2xl font-bold text-pompeyano">
-                                {type === 'legal' ? 'AVISO LEGAL' : 'ACCESIBILIDAD'}
-                            </h2>
-                            <button onClick={onClose} className="text-pizarra hover:text-pompeyano p-1 rounded focus:ring-2 focus:ring-pompeyano" aria-label="Cerrar ventana modal"><Icon path={Icons.X} size={24}/></button>
-                        </div>
-                        
-                        <div className="text-gray-700 font-merriweather text-sm leading-relaxed space-y-4 text-reading">
-                            {type === 'legal' ? (
-                                <React.Fragment>
-                                    <p><strong>Titularidad:</strong> Este sitio web es propiedad de la <strong>Asociación de Recreación Histórica IBIDEM</strong>.</p>
-                                    <p><strong>Finalidad:</strong> La web tiene como único objetivo la divulgación histórica y cultural sobre la vida civil en la antigua Roma. No tiene fines comerciales directos.</p>
-                                    <p><strong>Propiedad Intelectual:</strong> Todos los contenidos (textos, fotografías e investigaciones) son propiedad intelectual de la Asociación Ibidem o se utilizan bajo licencias que permiten su uso no comercial. Queda prohibida la reproducción total o parcial sin autorización expresa.</p>
-                                    <p><strong>Responsabilidad:</strong> La asociación no se hace responsable del uso indebido de los contenidos aquí expuestos.</p>
-                                </React.Fragment>
-                            ) : (
-                                <React.Fragment>
-                                    <p>En <strong>Ibidem</strong>, estamos comprometidos con hacer nuestra historia accesible para todos.</p>
-                                    <p>Trabajamos continuamente para mejorar la experiencia de usuario y aplicar los estándares de accesibilidad web pertinentes (WCAG 2.1), incluyendo:</p>
-                                    <ul className="list-disc pl-5 space-y-2 mt-2">
-                                        <li>Uso de textos alternativos en las imágenes para lectores de pantalla.</li>
-                                        <li>Contraste de color adecuado para facilitar la lectura.</li>
-                                        <li>Navegación clara y estructura semántica.</li>
-                                        <li>Diseño adaptable a dispositivos móviles.</li>
-                                    </ul>
-                                    <p className="mt-4">Si encuentras alguna barrera de acceso, por favor contáctanos en <a href="mailto:ibidemrecreacion@gmail.com" className="text-pompeyano underline">ibidemrecreacion@gmail.com</a>.</p>
-                                </React.Fragment>
-                            )}
-                        </div>
-                        
-                        <button onClick={onClose} className="mt-8 w-full bg-pompeyano text-white py-2 rounded hover:bg-pizarra transition font-cinzel tracking-widest focus:ring-4 focus:ring-dorado">CERRAR</button>
-                    </div>
                 </div>
             );
         };
@@ -760,5 +724,4 @@
     </script>
 </body>
 </html>
-
 

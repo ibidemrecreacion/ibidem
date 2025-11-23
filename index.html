@@ -48,6 +48,15 @@
         .border-roman { border: 3px double var(--color-pompeyano); }
         .text-shadow { text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
         
+        /* Ocultar barra de scroll en la tira de imágenes pero permitir scroll */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
         /* Animaciones */
         .fade-in { animation: fadeIn 0.6s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -377,6 +386,16 @@
                 }
             }, [albumId]);
 
+            // Efecto para centrar automáticamente la miniatura seleccionada
+            useEffect(() => {
+                if (lightboxIndex >= 0) {
+                    const thumb = document.getElementById(`thumb-${lightboxIndex}`);
+                    if (thumb) {
+                        thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                }
+            }, [lightboxIndex]);
+
             // Vista lista de álbumes
             if (!selectedAlbum) {
                 return (
@@ -402,7 +421,7 @@
             
             const currentImg = lightboxIndex >= 0 ? selectedAlbum.images[lightboxIndex] : null;
 
-            // Vista detalle álbum (FIXED: Uso de <div> contenedor y z-index alto inline)
+            // Vista detalle álbum
             return (
                 <div>
                     <div className="fade-in">
@@ -421,35 +440,43 @@
                         </div>
                     </div>
 
-                    {/* Lightbox fuera del flujo normal, con z-index MUY alto */}
+                    {/* Lightbox con diseño de "Tira de Película" (Filmstrip) al estilo Android */}
                     {lightboxIndex >= 0 && (
-                        <div className="fixed inset-0 bg-black/95 flex items-center justify-center" onClick={() => setLightboxIndex(-1)} style={{ zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
-                            {/* Botón Cerrar */}
-                            <button className="fixed top-4 right-4 text-white p-2 hover:text-dorado transition" style={{zIndex: 100000}}><Icon path={Icons.X} size={32}/></button>
+                        <div className="fixed inset-0 bg-black/95 flex flex-col justify-between" onClick={() => setLightboxIndex(-1)} style={{ zIndex: 99999, position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
                             
-                            {/* Flecha IZQUIERDA - Margen seguro */}
-                            <button className="fixed left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 flex items-center justify-center group" style={{zIndex: 100000}} onClick={(e) => {e.stopPropagation(); setLightboxIndex((lightboxIndex - 1 + selectedAlbum.images.length) % selectedAlbum.images.length)}}>
-                                <div className="bg-black/40 group-hover:bg-dorado/50 rounded-full p-2 transition backdrop-blur-sm"><Icon path={Icons.ChevronLeft} size={32} className="text-white"/></div>
-                            </button>
+                            {/* Botón Cerrar (Top Right) */}
+                            <button className="absolute top-4 right-4 z-[100000] text-white p-2 hover:text-dorado transition"><Icon path={Icons.X} size={32}/></button>
+                            
+                            {/* Área Principal de Imagen (Centro) */}
+                            <div className="flex-grow flex items-center justify-center p-4 overflow-hidden relative w-full" onClick={e => e.stopPropagation()}>
+                                <img src={currentImg.src} className="max-w-full max-h-[70vh] shadow-2xl border border-pizarra/50 object-contain rounded-sm" />
+                            </div>
 
-                            {/* Flecha DERECHA - Margen seguro extra */}
-                            <button className="fixed right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 flex items-center justify-center group" style={{zIndex: 100000}} onClick={(e) => {e.stopPropagation(); setLightboxIndex((lightboxIndex + 1) % selectedAlbum.images.length)}}>
-                                <div className="bg-black/40 group-hover:bg-dorado/50 rounded-full p-2 transition backdrop-blur-sm"><Icon path={Icons.ChevronRight} size={32} className="text-white"/></div>
-                            </button>
-
-                            {/* Imagen */}
-                            <div className="relative w-full h-full flex flex-col items-center justify-center p-4" onClick={e => e.stopPropagation()}>
-                                <img src={currentImg.src} className="max-w-full max-h-[80vh] shadow-2xl border border-pizarra/50 object-contain rounded-sm mb-4" />
+                            {/* Área Inferior: Caption + Tira de Miniaturas */}
+                            <div className="w-full bg-black/80 flex flex-col pt-2 pb-4 z-[100000] border-t border-gray-800" onClick={e => e.stopPropagation()}>
                                 
-                                <div className="flex flex-col items-center pointer-events-none">
-                                    <span className="text-white text-xs font-cinzel bg-pompeyano/90 px-3 py-1 rounded-full mb-2 shadow-lg">
-                                        {lightboxIndex + 1} / {selectedAlbum.images.length}
-                                    </span>
+                                {/* Caption y Contador */}
+                                <div className="px-4 mb-3 flex flex-col items-center">
+                                    <span className="text-dorado text-xs font-cinzel mb-1 tracking-widest">{lightboxIndex + 1} DE {selectedAlbum.images.length}</span>
                                     {currentImg.caption && (
-                                        <p className="text-pergamino text-xs md:text-sm italic font-merriweather lowercase text-center opacity-90 max-w-xl bg-black/60 px-4 py-2 rounded-lg backdrop-blur-md">
+                                        <p className="text-pergamino text-xs italic font-merriweather lowercase text-center opacity-90 max-w-xl">
                                             {currentImg.caption}
                                         </p>
                                     )}
+                                </div>
+
+                                {/* Tira de Miniaturas (Scroll Horizontal) */}
+                                <div className="flex items-center space-x-2 overflow-x-auto px-4 py-2 scrollbar-hide h-20 md:h-24">
+                                    {selectedAlbum.images.map((img, idx) => (
+                                        <div 
+                                            key={idx} 
+                                            id={`thumb-${idx}`}
+                                            className={`flex-shrink-0 cursor-pointer transition-all duration-300 ${idx === lightboxIndex ? 'border-2 border-dorado scale-105 opacity-100' : 'border border-transparent opacity-50 hover:opacity-80'}`}
+                                            onClick={(e) => { e.stopPropagation(); setLightboxIndex(idx); }}
+                                        >
+                                            <img src={img.src} className="h-16 md:h-20 w-auto object-cover rounded-sm" alt="miniatura" />
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>

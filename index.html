@@ -48,6 +48,13 @@
             .text-reading { text-align: justify; }
         }
 
+        /* Estilo para la bibliografía académica */
+        .biblio-item {
+            padding-left: 1.5rem;
+            text-indent: -1.5rem; /* Sangría francesa */
+            margin-bottom: 0.5rem;
+        }
+
         .border-roman { border: 3px double var(--color-pompeyano); }
         .text-shadow { text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
         
@@ -89,7 +96,7 @@
     </script>
 </head>
 <body>
-    <!-- PANTALLA DE CARGA -->
+    <!-- PANTALLA DE CARGA CON LOGO -->
     <div id="loader">
         <div class="spinner"></div>
         <img src="https://raw.githubusercontent.com/ibidemrecreacion/ibidem/refs/heads/main/Ibidem_logo_nuevo.png" alt="Cargando..." style="height: 60px; width: auto; margin-bottom: 10px;">
@@ -130,7 +137,8 @@
             ArrowLeft: "M19 12H5 M12 19l-7-7 7-7",
             ChevronLeft: "M15 18l-6-6 6-6",
             ChevronRight: "M9 18l6 6-6 6",
-            Camera: "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8"
+            Camera: "M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8",
+            BookOpen: "M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"
         };
 
         const SectionHeader = ({ title, subtitle }) => (
@@ -184,35 +192,19 @@
             </div>
         );
 
-        // SECCIÓN EVENTOS (FASTI) RESTAURADA
         const PageFasti = ({ data }) => {
             const upcoming = data.fasti.upcoming || [];
             const past = data.fasti.past || [];
 
-            // NUEVO DISEÑO DE FICHA
             const EventCard = ({ event }) => (
                 <div className="relative pl-6 md:pl-12 mb-8">
                     <div className="absolute -left-[10px] top-4 w-4 h-4 rounded-full bg-dorado border-2 border-pompeyano z-10"></div>
                     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
                         <h3 className="font-cinzel text-xl font-bold text-pompeyano mb-2">{event.title}</h3>
-                        
-                        {/* Localidad */}
-                        <p className="font-merriweather text-sm text-pizarra font-bold uppercase tracking-wide">
-                            {event.location.locality}
-                        </p>
-                        
-                        {/* Lugar concreto */}
-                        <p className="font-merriweather text-sm text-gray-600 italic mb-2">
-                            {event.location.place}
-                        </p>
-                        
-                        {/* Fecha */}
-                        <p className="font-cinzel text-xs text-dorado mb-4 lowercase">
-                            {event.date}
-                        </p>
-
+                        <p className="font-merriweather text-sm text-pizarra font-bold uppercase tracking-wide">{event.location.locality}</p>
+                        <p className="font-merriweather text-sm text-gray-600 italic mb-2">{event.location.place}</p>
+                        <p className="font-cinzel text-xs text-dorado mb-4 lowercase">{event.date}</p>
                         <p className="text-gray-600 mb-4 text-reading text-sm">{event.desc}</p>
-                        
                         <a href={`#imagina?id=${event.id}`} className="inline-flex items-center text-pizarra font-bold text-sm hover:text-pompeyano transition border-t border-gray-100 pt-3 w-full">
                             <span className="mr-2"><Icon path={Icons.Camera} size={18}/></span> Ver Galería
                         </a>
@@ -269,21 +261,55 @@
             </div>
         );
 
+        // --- COMPONENTE ARTÍCULO MEJORADO (TÍTULO MÁS PEQUEÑO + TEXTO JUSTIFICADO + BIBLIOGRAFÍA) ---
         const PageArticle = ({ id, data }) => {
             const article = data.tabularium.find(a => a.id == id);
             if (!article) return <div className="text-center py-20">Artículo no encontrado</div>;
             return (
                 <div className="fade-in max-w-3xl mx-auto bg-white p-6 md:p-12 rounded-xl shadow-2xl">
                     <a href="#tabularium" className="flex items-center text-pompeyano font-bold mb-6 hover:text-dorado"><span className="mr-2"><Icon path={Icons.ArrowLeft}/></span> Volver</a>
-                    <h1 className="font-cinzel text-3xl md:text-4xl font-bold text-pizarra mb-4">{article.title}</h1>
-                    <img src={article.img} className="w-full rounded-lg mb-8 shadow-md" alt="Portada" />
-                    <p className="text-xl italic text-gray-800 mb-8 border-l-4 border-pompeyano pl-4">{article.intro}</p>
+                    
+                    {/* CABECERA DEL ARTÍCULO (Estilo ajustado) */}
+                    <div className="mb-8 border-b border-dorado pb-4">
+                        <span className="text-xs font-cinzel text-dorado uppercase tracking-widest mb-2 block">{article.category}</span>
+                        <h1 className="font-cinzel text-2xl md:text-4xl font-bold text-pizarra mb-2 leading-tight">{article.title}</h1>
+                        <p className="text-gray-500 italic text-sm">Por {article.author} | {article.date}</p>
+                    </div>
+
+                    <img src={article.img} className="w-full rounded-lg mb-10 shadow-md" alt="Portada" />
+                    
+                    {/* INTRODUCCIÓN (Justificada) */}
+                    <p className="text-lg text-gray-800 mb-10 border-l-4 border-pompeyano pl-4 font-merriweather text-justify italic">{article.intro}</p>
+                    
+                    {/* CUERPO DEL ARTÍCULO */}
                     {article.sections.map((sec, i) => (
                         <div key={i} className="mb-8">
-                            <h2 className="font-cinzel text-xl font-bold text-pompeyano mb-2 border-b border-dorado pb-1">{sec.title}</h2>
-                            <p className="text-gray-700 leading-relaxed text-reading">{sec.content}</p>
+                            <h2 className="font-cinzel text-xl font-bold text-pompeyano mb-3 border-b border-gray-200 pb-1">{sec.title}</h2>
+                            <p className="text-gray-700 leading-relaxed text-justify mb-4">{sec.content}</p>
+                            
+                            {/* IMAGEN INTERCALADA EN SECCIÓN */}
+                            {sec.image && (
+                                <div className="my-6">
+                                    <img src={sec.image} alt={`Ilustración ${i}`} className="w-full h-auto rounded-lg shadow-sm border border-gray-200" />
+                                    {sec.caption && <p className="text-xs text-gray-500 text-center mt-2 italic">{sec.caption}</p>}
+                                </div>
+                            )}
                         </div>
                     ))}
+
+                    {/* SECCIÓN BIBLIOGRAFÍA ACADÉMICA */}
+                    {article.bibliography && article.bibliography.length > 0 && (
+                        <div className="mt-12 pt-8 border-t-2 border-gray-200 bg-gray-50 p-6 rounded-lg">
+                            <h3 className="font-cinzel text-lg font-bold text-pizarra mb-4 flex items-center">
+                                <span className="mr-2"><Icon path={Icons.BookOpen} size={20}/></span> FONTES ET BIBLIOGRAPHIA
+                            </h3>
+                            <ul className="text-sm text-gray-700 font-merriweather">
+                                {article.bibliography.map((ref, i) => (
+                                    <li key={i} className="biblio-item" dangerouslySetInnerHTML={{__html: ref}}></li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
             );
         };
@@ -324,15 +350,14 @@
                                     </div>
                                     <div className="p-4 text-center">
                                         <h3 className="font-cinzel text-lg font-bold text-pompeyano truncate mb-2">{album.eventTitle}</h3>
-                                        
-                                        {/* NUEVOS DATOS EN PORTADA DE ÁLBUM */}
                                         {album.location && (
                                             <div className="text-sm mb-2">
-                                                <p className="font-merriweather text-pizarra font-bold uppercase">{album.location.locality}</p>
-                                                <p className="font-merriweather text-gray-600 italic">{album.location.place}</p>
+                                                <p className="font-merriweather text-pizarra font-bold uppercase text-xs">{album.location.locality}</p>
+                                                <p className="font-merriweather text-gray-600 italic text-xs">{album.location.place}</p>
                                             </div>
                                         )}
                                         <p className="text-xs text-dorado lowercase font-cinzel">{album.date}</p>
+                                        <p className="text-xs text-gray-400 mt-2 uppercase tracking-widest">{album.images.length} FOTOS</p>
                                     </div>
                                 </a>
                             ))}
@@ -594,4 +619,3 @@
     </script>
 </body>
 </html>
-

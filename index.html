@@ -574,20 +574,30 @@
                         </div>
                     </div>
 
-                    {/* CORRECCIÓN 2: LIGHTBOX MODAL - Eliminado el comentario JS inválido y ajustado el layout. */}
+                    {/* Visor Lightbox */}
                     {lightboxIndex >= 0 && currentImg && (
-                        <div className="fixed inset-0 bg-black/95 flex flex-col justify-between z-[99999] h-screen" role="dialog" aria-modal="true" aria-label="Visor de imágenes">
+                        <div 
+                            // CORRECCIÓN: Z-index máximo (100000) para asegurar que esté sobre el footer principal.
+                            className="fixed inset-0 bg-black/95 flex flex-col justify-between z-[100000] h-screen" 
+                            role="dialog" 
+                            aria-modal="true" 
+                            aria-label="Visor de imágenes"
+                        >
                             <button 
                                 ref={closeButtonRef}
-                                className="absolute top-4 right-4 text-white p-2 hover:text-dorado transition z-[100000] focus:ring-2 focus:ring-dorado rounded"
+                                className="absolute top-4 right-4 text-white p-2 hover:text-dorado transition z-[100001] focus:ring-2 focus:ring-dorado rounded"
                                 onClick={() => setLightboxIndex(-1)}
                                 aria-label="Cerrar imagen"
                             >
                                 <Icon path={Icons.X} size={32}/>
                             </button>
                             
-                            {/* Flex-grow asegura que esta área tome el espacio restante para evitar el clipping del header/footer. */}
-                            <div className="flex-grow flex items-center justify-center p-4 overflow-hidden relative w-full" onClick={() => setLightboxIndex(-1)}>
+                            {/* Área de imagen principal */}
+                            <div 
+                                // CORRECCIÓN: Añadido bg-black para evitar artefactos visuales o que se filtre el fondo.
+                                className="flex-grow flex items-center justify-center p-4 overflow-hidden relative w-full bg-black" 
+                                onClick={() => setLightboxIndex(-1)}
+                            >
                                 <img 
                                     src={currentImg.src} 
                                     alt={currentImg.caption || "Imagen ampliada"} 
@@ -596,6 +606,7 @@
                                 />
                             </div>
 
+                            {/* Área de miniaturas y pie de Lightbox */}
                             <div className="w-full bg-black/90 flex flex-col pt-2 pb-4 border-t border-gray-800" onClick={e => e.stopPropagation()}>
                                 <div className="px-4 mb-3 flex flex-col items-center">
                                     <span className="text-dorado text-xs font-cinzel mb-1 tracking-widest" aria-live="polite">{lightboxIndex + 1} DE {selectedAlbum.images.length}</span>

@@ -28,6 +28,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
 
     <style>
+        /* Variables y estilos globales */
         :root {
             --color-pompeyano: #9A2A2A;
             --color-pergamino: #F5EFE3;
@@ -38,6 +39,7 @@
         body {
             font-family: 'Merriweather', serif;
             background-color: var(--color-pergamino);
+            /* Patrón de textura suave */
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
             color: var(--color-pizarra);
             margin: 0;
@@ -47,6 +49,7 @@
         .font-cinzel { font-family: 'Cinzel', serif; }
         .font-merriweather { font-family: 'Merriweather', serif; }
         
+        /* Estilo de lectura justificado e hiphenación */
         .text-reading { 
             text-align: justify; 
             -webkit-hyphens: auto; hyphens: auto;
@@ -56,18 +59,22 @@
         .text-dorado-safe { color: var(--color-dorado-safe); }
         .text-dorado { color: var(--color-dorado); }
 
+        /* Estilo para items de bibliografía con indentación colgante */
         .biblio-item {
             padding-left: 1.5rem; text-indent: -1.5rem; margin-bottom: 0.5rem; text-align: left;
         }
 
+        /* Animación de entrada para contenido dinámico */
         .fade-in { animation: fadeIn 0.6s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Estilo de focus para accesibilidad */
         *:focus-visible {
             outline: 3px solid var(--color-pompeyano);
             outline-offset: 2px;
         }
         
+        /* Enlace para saltar contenido (Accesibilidad) */
         .skip-link {
             position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; z-index: 99999; 
         }
@@ -75,13 +82,16 @@
             position: absolute; left: 0; top: 0; width: auto; height: auto; padding: 10px; background: var(--color-pompeyano); color: white; text-decoration: none; font-family: 'Cinzel', serif; font-weight: bold;
         }
 
+        /* Pantalla de Carga y Error (Fija) */
         #loader, #error-screen {
             position: fixed; inset: 0; background: var(--color-pergamino);
             display: flex; justify-content: center; align-items: center; z-index: 9999;
             flex-direction: column; text-align: center; padding: 20px;
+            opacity: 1; transition: opacity 0.5s; /* Añadir transición de opacidad */
         }
         #error-screen { display: none; }
         
+        /* Spinner de carga */
         .spinner {
             width: 50px; height: 50px; border: 5px solid var(--color-dorado);
             border-top: 5px solid var(--color-pompeyano); border-radius: 50%;
@@ -89,20 +99,22 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
+        /* Ocultar scrollbar en contenedor de miniaturas (para el Lightbox) */
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
     </style>
     
     <script>
+        // Configuración de Tailwind para usar las variables CSS
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        pompeyano: '#9A2A2A',
-                        pergamino: '#F5EFE3',
-                        pizarra: '#2A2A2A',
-                        dorado: '#B8860B',
-                        'dorado-safe': '#856404'
+                        pompeyano: 'var(--color-pompeyano)',
+                        pergamino: 'var(--color-pergamino)',
+                        pizarra: 'var(--color-pizarra)',
+                        dorado: 'var(--color-dorado)',
+                        'dorado-safe': 'var(--color-dorado-safe)'
                     }
                 }
             }
@@ -112,25 +124,27 @@
 <body>
     <a href="#main-content" class="skip-link font-cinzel font-bold">Saltar al contenido principal</a>
 
+    <!-- LOADER (Pantalla de carga inicial) -->
     <div id="loader" aria-live="polite" role="status">
         <div class="spinner"></div>
         <img src="https://raw.githubusercontent.com/ibidemrecreacion/ibidem/refs/heads/main/Ibidem_logo_nuevo.svg" alt="" style="height: 60px; width: auto; margin-bottom: 10px;">
-        <p style="font-family: 'Cinzel', serif; color: #856404; font-size: 0.8rem;">CARGANDO HISTORIA...</p>
+        <p style="font-family: 'Cinzel', serif; color: var(--color-dorado-safe); font-size: 0.8rem;">CARGANDO HISTORIA...</p>
     </div>
 
+    <!-- ERROR SCREEN (Se mostrará si falla la carga del JSON) -->
     <div id="error-screen" role="alert">
         <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#9A2A2A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 20px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-        <h2 style="font-family: 'Cinzel', serif; color: #9A2A2A; font-weight: bold; font-size: 1.5rem; margin-bottom: 10px;">DISCULPE LAS MOLESTIAS</h2>
-        <p style="font-family: 'Merriweather', serif; color: #2A2A2A; font-size: 1rem; max-width: 500px;">Estamos actualizando nuestros archivos históricos o ha ocurrido un error de conexión al cargar 'datos.json'.</p>
-        <p id="technical-error" style="font-family: monospace; color: #999; font-size: 0.7rem; margin-top: 20px;"></p>
+        <h2 style="font-family: 'Cinzel', serif; color: #9A2A2A; font-weight: bold; font-size: 1.5rem; margin-bottom: 10px;">ERROR DE CARGA</h2>
+        <p style="font-family: 'Merriweather', serif; color: #2A2A2A; font-size: 1rem; max-width: 500px;">No pudimos cargar los archivos de datos (datos.json). Por favor, asegúrate de que el archivo exista en el servidor y sea accesible.</p>
+        <p style="font-family: 'Merriweather', serif; color: #2A2A2A; font-size: 0.9rem; margin-top: 10px;">Si estás abriendo el archivo localmente (con `file://`), debes usar la versión de un solo archivo.</p>
     </div>
 
     <div id="root"></div>
 
     <script type="text/babel">
-
         const { useState, useEffect, useMemo, useRef } = React;
         
+        // Función auxiliar para parsear fechas de los eventos
         const parseDate = (dateStr) => {
             if(!dateStr) return new Date(0);
             try {
@@ -147,8 +161,8 @@
             } catch (e) { return new Date(0); }
         };
 
-        // --- ICONS & COMPONENTS ---
-
+        // --- ICONOS Y COMPONENTES REUTILIZABLES ---
+        
         const SectionTitle = ({ children, subtitle }) => (
             <div className="text-center mb-10 mt-12 fade-in">
                 <h2 className="font-cinzel text-3xl md:text-4xl font-bold text-pizarra inline-block border-b-4 border-dorado pb-2 px-4">{children}</h2>
@@ -156,10 +170,12 @@
             </div>
         );
 
+        // Componente de Icono SVG (basado en Feather Icons)
         const Icon = ({ path, size = 24, className = "", ariaHidden = true }) => (
             <svg aria-hidden={ariaHidden} xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d={path} /></svg>
         );
         
+        // Definiciones de Path de Iconos
         const Icons = {
             Menu: "M4 12h16M4 6h16M4 18h16",
             X: "M18 6L6 18M6 6l12 12",
@@ -178,7 +194,7 @@
             <header className="w-full bg-pizarra text-pergamino p-6 md:p-8 rounded-xl shadow-xl mb-12 text-center border-b-4 border-dorado fade-in">
                 <h1 className="font-cinzel text-3xl md:text-5xl font-bold tracking-wider mb-1 focus:outline-none" tabIndex="-1">{title}</h1>
                 {subtitle && <p className="font-cinzel text-dorado text-lg tracking-widest uppercase italic mt-1">{subtitle}</p>}
-            </div>
+            </header>
         );
 
         // BOTÓN VOLVER ARRIBA
@@ -206,14 +222,14 @@
                 legal: (<React.Fragment><p className="mb-4 font-bold">TITULARIDAD:</p><p className="mb-4">Ibidem, Asociación de Recreación Histórica.</p><p className="mb-4 font-bold">OBJETO:</p><p className="mb-4">Divulgación histórica y cultural.</p><p className="mb-4 font-bold">PROPIEDAD INTELECTUAL:</p><p className="mb-4">Contenidos propiedad de Ibidem. Prohibida reproducción sin permiso.</p></React.Fragment>), 
                 accesibilidad: (<React.Fragment><p className="mb-4 font-bold">COMPROMISO:</p><p className="mb-4">Cumplimiento básico con estándares WCAG 2.1.</p><ul className="list-disc ml-5 mb-4 space-y-1"><li>Alto contraste.</li><li>Navegación teclado.</li><li>Textos alt.</li></ul></React.Fragment>) 
             }; 
-            return (<div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[100001] fade-in" onClick={onClose} role="dialog" aria-modal="true"><div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 md:p-8 relative" onClick={e => e.stopPropagation()}><button className="absolute top-3 right-3 text-pizarra hover:text-pompeyano p-2" onClick={onClose}><Icon path={Icons.X} size={24}/></button><h2 className="font-cinzel text-xl md:text-2xl font-bold text-pompeyano mb-4 border-b pb-2">{titles[type]}</h2><div className="text-gray-700 text-sm font-merriweather text-reading">{content[type]}</div><button className="mt-6 w-full bg-pompeyano text-white font-cinzel tracking-widest py-2 rounded hover:bg-pompeyano/80 transition" onClick={onClose}>CERRAR</button></div></div>); 
+            return (<div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-[100001] fade-in" onClick={onClose} role="dialog" aria-modal="true"><div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 md:p-8 relative" onClick={e => e.stopPropagation()}><button className="absolute top-3 right-3 text-pizarra hover:text-pompeyano p-2" onClick={onClose} aria-label="Cerrar modal"><Icon path={Icons.X} size={24}/></button><h2 className="font-cinzel text-xl md:text-2xl font-bold text-pompeyano mb-4 border-b pb-2">{titles[type]}</h2><div className="text-gray-700 text-sm font-merriweather text-reading">{content[type]}</div><button className="mt-6 w-full bg-pompeyano text-white font-cinzel tracking-widest py-2 rounded hover:bg-pompeyano/80 transition" onClick={onClose}>CERRAR</button></div></div>); 
         };
 
-        // --- PAGES ---
+        // --- PÁGINAS ---
 
         const PageHome = ({ data }) => (
             <div className="fade-in">
-                <section className="relative h-[60vh] w-full bg-cover bg-center rounded-xl overflow-hidden shadow-xl mb-12 group" style={{ backgroundImage: `url(${data.general.heroImageHome})` }} aria-label="Imagen de portada">
+                <section className="relative h-[60vh] w-full bg-cover bg-center rounded-xl overflow-hidden shadow-xl mb-12 group" style={{ backgroundImage: `url(${data.general.heroImageHome})` }} aria-label="Imagen de portada de Ibidem: Recreación Histórica">
                     <div className="absolute inset-0 bg-gradient-to-t from-pizarra/90 via-transparent to-transparent"></div>
                     <div className="absolute bottom-6 left-6 md:bottom-12 md:left-12 max-w-2xl p-4">
                         <h1 className="font-merriweather text-xl md:text-2xl italic text-pergamino text-shadow leading-relaxed border-l-4 border-dorado pl-4 focus:outline-none" tabIndex="-1">
@@ -258,14 +274,17 @@
         const PageFasti = ({ data }) => {
             const { future, past } = useMemo(() => {
                 const allEvents = [...(data.fasti.upcoming || []), ...(data.fasti.past || [])];
+                // Eliminar duplicados si existen basándose en el ID (aunque los IDs deberían ser únicos)
                 const uniqueEvents = Array.from(new Map(allEvents.map(item => [item.id, item])).values());
                 const future = [], past = [];
+                
                 uniqueEvents.forEach(evt => {
                     const evtDate = parseDate(evt.date);
                     const dateCheck = new Date(evtDate); dateCheck.setHours(0,0,0,0);
                     const todayCheck = new Date(); todayCheck.setHours(0,0,0,0);
                     if (dateCheck >= todayCheck) future.push(evt); else past.push(evt);
                 });
+                // Ordenar: futuros ascendente, pasados descendente
                 future.sort((a, b) => parseDate(a.date) - parseDate(b.date));
                 past.sort((a, b) => parseDate(b.date) - parseDate(a.date));
                 return { future, past };
@@ -275,7 +294,9 @@
 
             const EventCard = ({ event }) => (
                 <article className="relative pl-6 md:pl-12 mb-8 fade-in group">
+                    {/* Círculo de la línea de tiempo */}
                     <div className="absolute -left-[10px] top-4 w-4 h-4 rounded-full bg-dorado border-2 border-pompeyano z-10"></div>
+                    {/* Línea de tiempo */}
                     <div className="absolute left-[-3px] top-8 bottom-[-32px] w-[2px] bg-pompeyano/20 group-last:hidden"></div>
                     <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow">
                         <div className="flex flex-col md:flex-row justify-between md:items-start mb-2">
@@ -317,7 +338,7 @@
             const filteredArticles = data.tabularium.filter(article => {
                 const matchesCategory = categoryFilter === 'TODOS' || article.category === categoryFilter;
                 const searchLower = searchTerm.toLowerCase();
-                const matchesSearch = article.title.toLowerCase().includes(searchLower) || article.intro.toLowerCase().includes(searchLower);
+                const matchesSearch = article.title.toLowerCase().includes(searchLower) || article.summary.toLowerCase().includes(searchLower);
                 return matchesCategory && matchesSearch;
             });
 
@@ -326,19 +347,19 @@
                     <SectionHeader title="TABULARIUM" subtitle="Archivo Académico" />
                     <div className="max-w-4xl mx-auto mb-10 px-4">
                         <div className="relative mb-6">
-                            <input type="text" placeholder="Buscar artículos..." className="w-full p-3 pl-10 rounded-lg border-2 border-gray-200 focus:border-pompeyano focus:outline-none font-merriweather" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                            <input type="text" placeholder="Buscar artículos..." className="w-full p-3 pl-10 rounded-lg border-2 border-gray-200 focus:border-pompeyano focus:outline-none font-merriweather" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} aria-label="Buscar artículos en el Tabularium"/>
                             <div className="absolute left-3 top-3.5 text-gray-400"><Icon path={Icons.Search} size={20} /></div>
                         </div>
                         <div className="flex flex-wrap justify-center gap-2">
                             {categories.map(cat => (
-                                <button key={cat} onClick={() => setCategoryFilter(cat)} className={`px-4 py-1 rounded-full text-xs font-cinzel font-bold tracking-wider border transition ${categoryFilter === cat ? 'bg-pompeyano text-white border-pompeyano' : 'bg-white text-gray-600 border-gray-300 hover:border-pompeyano'}`}>{cat.toUpperCase()}</button>
+                                <button key={cat} onClick={() => setCategoryFilter(cat)} className={`px-4 py-1 rounded-full text-xs font-cinzel font-bold tracking-wider border transition ${categoryFilter === cat ? 'bg-pompeyano text-white border-pompeyano' : 'bg-white text-gray-600 border-gray-300 hover:border-pompeyano'}`} aria-pressed={categoryFilter === cat}>{cat.toUpperCase()}</button>
                             ))}
                         </div>
                     </div>
                     <div className="grid md:grid-cols-2 gap-8">
                         {filteredArticles.map(article => (
                             <article key={article.id} className="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col hover:shadow-2xl transition-shadow duration-300">
-                                <div className="h-48 overflow-hidden"><img src={article.img} className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" alt="" loading="lazy" /></div>
+                                <div className="h-48 overflow-hidden"><img src={article.img} className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" alt={`Imagen de portada para el artículo: ${article.title}`} loading="lazy" /></div>
                                 <div className="p-6 flex-grow flex flex-col">
                                     <span className="text-xs font-cinzel text-dorado-safe uppercase mb-2 tracking-widest">{article.category}</span>
                                     <h3 className="font-cinzel text-xl font-bold text-pompeyano mb-3 leading-tight">{article.title}</h3>
@@ -354,6 +375,7 @@
 
         const PageArticle = ({ id, data }) => {
             const article = data.tabularium.find(a => a.id == id);
+            // Enfocar el título al cargar para accesibilidad
             useEffect(() => { window.scrollTo(0,0); const title = document.getElementById('article-title'); if(title) title.focus(); }, [id]);
             if (!article) return <div className="text-center py-20 text-pompeyano font-cinzel text-xl">Artículo no encontrado.</div>;
             
@@ -422,7 +444,7 @@
             useEffect(() => {
                 if (albumId) {
                     let found = enrichedAlbums.find(a => a.id == albumId);
-                    // Si no está en imagina, buscar en eventos y crear album virtual
+                    // Si no está en imagina, buscar en eventos y crear album virtual (si tiene imágenes)
                     if (!found && data.fasti) {
                         const event = [...(data.fasti.upcoming || []), ...(data.fasti.past || [])].find(e => e.id == albumId);
                         if (event && event.images) { 
@@ -443,13 +465,53 @@
                 }
             }, [albumId, enrichedAlbums, data.fasti]);
 
-            useEffect(() => { const handleKeyDown = (e) => { if (lightboxIndex === -1) return; if (e.key === 'ArrowRight') nextImage(); else if (e.key === 'ArrowLeft') prevImage(); else if (e.key === 'Escape') setLightboxIndex(-1); }; window.addEventListener('keydown', handleKeyDown); return () => window.removeEventListener('keydown', handleKeyDown); }, [lightboxIndex, selectedAlbum]);
+            // Lógica para Lightbox (navegación por teclado y scroll de miniaturas)
+            useEffect(() => { 
+                const handleKeyDown = (e) => { 
+                    if (lightboxIndex === -1) return; 
+                    if (e.key === 'ArrowRight') nextImage(); 
+                    else if (e.key === 'ArrowLeft') prevImage(); 
+                    else if (e.key === 'Escape') setLightboxIndex(-1); 
+                }; 
+                window.addEventListener('keydown', handleKeyDown); 
+                return () => window.removeEventListener('keydown', handleKeyDown); 
+            }, [lightboxIndex, selectedAlbum]);
+
             const nextImage = () => { if (!selectedAlbum) return; setLightboxIndex(prev => (prev + 1) % selectedAlbum.images.length); };
             const prevImage = () => { if (!selectedAlbum) return; setLightboxIndex(prev => (prev - 1 + selectedAlbum.images.length) % selectedAlbum.images.length); };
+            
+            // Lógica para Lightbox (navegación táctil con swipe)
             const onTouchStart = (e) => { setTouchEnd(null); setTouchStart(e.targetTouches[0].clientX); }
             const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
-            const onTouchEnd = () => { if (!touchStart || !touchEnd) return; const distance = touchStart - touchEnd; if (Math.abs(distance) > 50) { if (distance > 0) nextImage(); if (distance < 0) prevImage(); } }
-            useEffect(() => { if (lightboxIndex >= 0) { document.body.style.overflow = 'hidden'; setTimeout(() => { if (thumbnailsRef.current) { const thumb = thumbnailsRef.current.querySelector(`#thumb-${lightboxIndex}`); if (thumb) { const thumbLeft = thumb.offsetLeft; const thumbWidth = thumb.offsetWidth; const containerWidth = thumbnailsRef.current.offsetWidth; thumbnailsRef.current.scrollLeft = thumbLeft - (containerWidth / 2) + (thumbWidth / 2); } } }, 100); } else { document.body.style.overflow = 'auto'; } return () => { document.body.style.overflow = 'auto'; } }, [lightboxIndex, selectedAlbum]);
+            const onTouchEnd = () => { 
+                if (!touchStart || !touchEnd) return; 
+                const distance = touchStart - touchEnd; 
+                if (Math.abs(distance) > 50) { 
+                    if (distance > 0) nextImage(); 
+                    if (distance < 0) prevImage(); 
+                } 
+            }
+            
+            // Efecto para controlar el scroll del cuerpo y la posición de la miniatura en el lightbox
+            useEffect(() => { 
+                if (lightboxIndex >= 0) { 
+                    document.body.style.overflow = 'hidden'; 
+                    setTimeout(() => { 
+                        if (thumbnailsRef.current) { 
+                            const thumb = thumbnailsRef.current.querySelector(`#thumb-${lightboxIndex}`); 
+                            if (thumb) { 
+                                const thumbLeft = thumb.offsetLeft; 
+                                const thumbWidth = thumb.offsetWidth; 
+                                const containerWidth = thumbnailsRef.current.offsetWidth; 
+                                thumbnailsRef.current.scrollLeft = thumbLeft - (containerWidth / 2) + (thumbWidth / 2); 
+                            } 
+                        } 
+                    }, 100); 
+                } else { 
+                    document.body.style.overflow = 'auto'; 
+                } 
+                return () => { document.body.style.overflow = 'auto'; } 
+            }, [lightboxIndex, selectedAlbum]);
 
             if (!selectedAlbum) {
                 return (
@@ -458,7 +520,7 @@
                         {uniqueTags.length > 1 && (
                             <div className="flex flex-wrap justify-center gap-2 mb-8 px-4">
                                 {uniqueTags.map(tag => (
-                                    <button key={tag} onClick={() => setTagFilter(tag)} className={`px-3 py-1 rounded-full text-[10px] font-cinzel font-bold tracking-widest border transition uppercase ${tagFilter === tag ? 'bg-pompeyano text-white border-pompeyano' : 'bg-white text-gray-500 border-gray-300 hover:border-pompeyano'}`}>{tag}</button>
+                                    <button key={tag} onClick={() => setTagFilter(tag)} className={`px-3 py-1 rounded-full text-[10px] font-cinzel font-bold tracking-widest border transition uppercase ${tagFilter === tag ? 'bg-pompeyano text-white border-pompeyano' : 'bg-white text-gray-500 border-gray-300 hover:border-pompeyano'}`} aria-pressed={tagFilter === tag}>{tag}</button>
                                 ))}
                             </div>
                         )}
@@ -466,7 +528,7 @@
                             {filteredAlbums.map((album, idx) => (
                                 <a key={idx} href={`#imagina?id=${album.id}`} className="block bg-white rounded-xl shadow-lg overflow-hidden hover:-translate-y-1 transition group focus:outline-none focus:ring-4 focus:ring-pompeyano">
                                     <div className="h-48 overflow-hidden relative">
-                                        <img src={album.coverImage} className="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="" loading="lazy" />
+                                        <img src={album.coverImage} className="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt={`Portada del álbum: ${album.eventTitle}`} loading="lazy" />
                                         <div className="absolute inset-0 bg-pompeyano/80 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition duration-300 font-cinzel font-bold tracking-widest">VER ÁLBUM</div>
                                     </div>
                                     <div className="p-4 text-center border-b-4 border-dorado">
@@ -533,29 +595,56 @@
             );
         };
 
+        // --- COMPONENTE PRINCIPAL DE LA APP ---
         const App = () => {
             const [route, setRoute] = useState({ page: 'home', params: {} });
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
             const [data, setData] = useState(null);
             const [legalModal, setLegalModal] = useState(null);
+            const [error, setError] = useState(false); // Nuevo estado para manejar errores de carga
             const mainRef = useRef(null);
 
+            // FUNCIÓN DE CARGA DE DATOS (fetch)
             useEffect(() => {
-                // SIMULAR CARGA DE DATOS (para ver el loader)
-                fetch('./datos.json').then(r => r.json()).then(d => {
-                    // Si existe datos.json, úsalo (prioridad)
-                    setData(d);
-                    const loader = document.getElementById('loader');
-                    if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }
-                }).catch(() => {
-                    // Si falla (estás en local sin servidor), usa la variable DATA interna
-                    console.log("Usando datos locales integrados.");
-                    setData(DATA);
-                    const loader = document.getElementById('loader');
-                    if(loader) { loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 500); }
-                });
-            }, []);
+                const loadData = async () => {
+                    try {
+                        // Intentamos cargar datos.json desde la raíz del sitio
+                        const response = await fetch('./datos.json'); 
+                        
+                        if (!response.ok) {
+                             // Si la respuesta no es 200 (ej. 404), lanzamos un error
+                            throw new Error(`Error al cargar datos.json: ${response.status} ${response.statusText}`);
+                        }
+                        
+                        const json = await response.json();
+                        setData(json);
+                        setError(false); // Aseguramos que no haya error
+                        
+                    } catch (e) {
+                        console.error("Fallo catastrófico al cargar los datos:", e);
+                        setError(true); // Establecemos el estado de error
+                        
+                    } finally {
+                         // Ocultamos la pantalla de carga
+                        const loader = document.getElementById('loader');
+                        const errorScreen = document.getElementById('error-screen');
 
+                        if (loader) { 
+                            loader.style.opacity = '0'; 
+                            setTimeout(() => loader.style.display = 'none', 500); 
+                        }
+                        
+                        if (errorScreen && error) {
+                            errorScreen.style.display = 'flex';
+                            errorScreen.style.opacity = '1';
+                        }
+                    }
+                };
+                
+                loadData();
+            }, []); // Se ejecuta una sola vez al montar el componente
+
+            // Lógica de ruteo por Hash
             useEffect(() => {
                 const handleHashChange = () => {
                     const hash = window.location.hash.substring(1) || 'home';
@@ -572,11 +661,13 @@
                 return () => window.removeEventListener('hashchange', handleHashChange);
             }, []);
 
+            // Actualizar título de la página
             useEffect(() => {
                 const titles = { home: 'Inicio', nostri: 'Nostri', fasti: 'Fasti', tabularium: 'Tabularium', imagina: 'Imagina', article: 'Artículo' };
                 document.title = `${titles[route.page] || 'Ibidem'} | Recreación Histórica`;
             }, [route.page]);
 
+            // Componentes de Navegación
             const NavItem = ({ to, label }) => {
                 const isActive = route.page === to;
                 return (<a href={`#${to}`} className={`font-cinzel font-semibold transition tracking-wider p-2 rounded focus:ring-2 focus:ring-pompeyano ${isActive ? 'text-pompeyano border-b-2 border-pompeyano' : 'text-pizarra hover:text-pompeyano'}`} aria-current={isActive ? 'page' : undefined}>{label}</a>);
@@ -584,8 +675,15 @@
 
             const MobileNavItem = ({ to, label }) => (<a href={`#${to}`} className="block px-4 py-3 text-white border-b border-white/10 hover:bg-black/20 font-cinzel tracking-widest focus:bg-black/20 focus:outline-none">{label}</a>);
 
-            if (!data) return null;
-
+            // Si los datos no han cargado (y no hay error), mostramos null para que el loader se encargue de la UI
+            if (!data) {
+                // Si hay un error de carga, la pantalla de error ya está visible (gestionado en loadData)
+                if (error) return null; 
+                // Si aún está cargando y no hay error, no renderizamos nada
+                return null; 
+            }
+            
+            // Si la carga fue exitosa, renderizamos el contenido
             let Content = <PageHome data={data} />;
             if (route.page === 'nostri') Content = <PageNostri data={data} />;
             if (route.page === 'fasti') Content = <PageFasti data={data} />;
@@ -629,5 +727,4 @@
     </script>
 </body>
 </html>
-
 

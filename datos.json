@@ -200,6 +200,7 @@
        "location": { "locality": "Monturque (Córdoba)", "place": "Criptopórtico" },
        "coverImage": "https://raw.githubusercontent.com/ibidemrecreacion/ibidemrecreacion.github.io/refs/heads/main/IMG-20251027-WA0038(1).jpg",
        "images": [
+           { "src": "https://raw.githubusercontent.com/ibidemrecreacion/ibidemrecreacion.github.io/refs/heads/main/IMG-20251027-WA0038(1).jpg", "caption": "" },          
            { "src": "https://raw.githubusercontent.com/ibidemrecreacion/ibidem/main/IMG-20251122-WA0016.jpg", "caption": "Praeco, encargado de la conclamatio y de la nuntiatio mortis" },
            { "src": "https://raw.githubusercontent.com/ibidemrecreacion/ibidem/main/IMG-20251122-WA0010.jpg", "caption": "Pollinctor, encargado de la limpieza del cuerpo" },
            { "src": "https://raw.githubusercontent.com/ibidemrecreacion/ibidem/main/IMG-20251122-WA0018.jpg", "caption": "Libitinarius, empresario encargado de las exequias fúnebres" },
